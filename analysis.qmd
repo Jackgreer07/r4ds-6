@@ -15,6 +15,7 @@ library(dbplyr)
 ```
 
 ```{r}
+#| message: false
 con <- dbConnect(duckdb(), "data/atus.duckdb")
 
 dbplyr_act <- tbl(con, "activities")
@@ -24,6 +25,7 @@ dbplyr_codes <- tbl(con, "activity_codes")
 
 ```{r}
 #| cache: true
+#| message: false
 activity_avg <- dbplyr_act |>
   inner_join(
     dbplyr_resp |>
@@ -43,6 +45,7 @@ activity_avg <- dbplyr_act |>
 ```
 
 ```{r}
+#| message: false
 keep_cats <- c(
   "Personal Care Activities",
   "Household Activities",
@@ -67,8 +70,6 @@ hourly_avg <- dbplyr_act |>
   group_by(sex, hour, major_name) |>
   summarise(avg_min = mean(duration_min, na.rm = TRUE)) |>
   collect()
-
-print(hourly_avg, n = Inf)
 ```
 
 ```{r}
