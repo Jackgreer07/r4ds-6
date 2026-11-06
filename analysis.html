@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jack Greer">
+
+<title>Analyzing Americans’ Time Use</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="analysis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="analysis_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="analysis_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="analysis_files/libs/quarto-html/popper.min.js"></script>
+<script src="analysis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="analysis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="analysis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="analysis_files/libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="analysis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="analysis_files/libs/bootstrap/bootstrap-5dce3422ae1aaea6fd35e22067a0726d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Analyzing Americans’ Time Use</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Jack Greer </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>duckdb keeps downloaded extensions and secrets in a temporary directory:
+ℹ /tmp/RtmpdW8zDT/duckdb
+This is removed when the R session ends.
+• Extensions are re-downloaded each session.
+• Secrets are lost.
+ℹ Run duckdb(shared_home = TRUE) (or create ~/.duckdb) to keep them (suitable for most users).
+ℹ Run duckdb(shared_home = FALSE) to accept the temporary directory (and silence this message).
+ℹ See ?duckdb_storage for details and alternatives.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>! Grouped output by "tucaseid", "sex", and "major_code".
+ℹ Override behaviour and silence this message with the `.groups` argument.
+ℹ Or use `.by` instead of `group_by()`.
+! Grouped output by "sex" and "major_code".
+ℹ Override behaviour and silence this message with the `.groups` argument.
+ℹ Or use `.by` instead of `group_by()`.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>! Grouped output by "sex" and "hour".
+ℹ Override behaviour and silence this message with the `.groups` argument.
+ℹ Or use `.by` instead of `group_by()`.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 144 × 4
+# Groups:   sex, hour [36]
+    sex     hour major_name                                  avg_min
+    &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;                                         &lt;dbl&gt;
+  1 Female    14 Socializing, Relaxing, and Leisure             92.1
+  2 Female    16 Personal Care Activities                       54.1
+  3 Female    18 Socializing, Relaxing, and Leisure            110. 
+  4 Female    19 Socializing, Relaxing, and Leisure            105. 
+  5 Female    23 Personal Care Activities                      220. 
+  6 Female     8 Household Activities                           49.3
+  7 Female     9 Socializing, Relaxing, and Leisure             96.0
+  8 Female    19 Household Activities                           31.7
+  9 Female    22 Personal Care Activities                      242. 
+ 10 Female     7 Socializing, Relaxing, and Leisure             81.3
+ 11 Female    15 Household Activities                           39.8
+ 12 Female    15 Socializing, Relaxing, and Leisure             86.1
+ 13 Female    21 Personal Care Activities                      234. 
+ 14 Female     7 Household Activities                           40.6
+ 15 Female    11 Household Activities                           41.5
+ 16 Female    13 Personal Care Activities                       71.3
+ 17 Female    14 Household Activities                           41.9
+ 18 Female    18 Household Activities                           31.3
+ 19 Male       6 Personal Care Activities                       41.7
+ 20 Male      15 Personal Care Activities                       64.2
+ 21 Male      18 Socializing, Relaxing, and Leisure            130. 
+ 22 Male      21 Household Activities                           27.8
+ 23 Male      10 Socializing, Relaxing, and Leisure            117. 
+ 24 Male      14 Household Activities                           54.3
+ 25 Male      14 Socializing, Relaxing, and Leisure            122. 
+ 26 Female     9 Household Activities                           50.6
+ 27 Female    20 Personal Care Activities                      184. 
+ 28 Female     6 Household Activities                           34.3
+ 29 Female     6 Socializing, Relaxing, and Leisure             84.1
+ 30 Female    10 Socializing, Relaxing, and Leisure             94.7
+ 31 Female    12 Caring For &amp; Helping Household (HH) Members    36.2
+ 32 Female    13 Caring For &amp; Helping Household (HH) Members    34.7
+ 33 Female    17 Personal Care Activities                       58.0
+ 34 Female    21 Caring For &amp; Helping Household (HH) Members    21.4
+ 35 Female    22 Caring For &amp; Helping Household (HH) Members    22.2
+ 36 Male       7 Personal Care Activities                       40.5
+ 37 Male       9 Household Activities                           67.4
+ 38 Female    10 Household Activities                           48.3
+ 39 Female    12 Personal Care Activities                       68.7
+ 40 Female    17 Caring For &amp; Helping Household (HH) Members    35.0
+ 41 Female     8 Socializing, Relaxing, and Leisure             90.3
+ 42 Male       9 Socializing, Relaxing, and Leisure            116. 
+ 43 Male      12 Personal Care Activities                       75.1
+ 44 Male      22 Household Activities                           24.8
+ 45 Male      23 Personal Care Activities                      228. 
+ 46 Male      11 Personal Care Activities                       69.8
+ 47 Male      21 Socializing, Relaxing, and Leisure             80.0
+ 48 Male      22 Socializing, Relaxing, and Leisure             67.2
+ 49 Female    23 Caring For &amp; Helping Household (HH) Members    22.8
+ 50 Female    11 Socializing, Relaxing, and Leisure             96.5
+ 51 Male      16 Personal Care Activities                       62.8
+ 52 Female    20 Caring For &amp; Helping Household (HH) Members    23.8
+ 53 Male       6 Caring For &amp; Helping Household (HH) Members    27.4
+ 54 Male      10 Household Activities                           56.8
+ 55 Male      17 Caring For &amp; Helping Household (HH) Members    37.5
+ 56 Male      20 Caring For &amp; Helping Household (HH) Members    25.7
+ 57 Male      19 Personal Care Activities                      173. 
+ 58 Male      20 Personal Care Activities                      232. 
+ 59 Male      15 Caring For &amp; Helping Household (HH) Members    34.7
+ 60 Male      18 Household Activities                           32.8
+ 61 Male       8 Personal Care Activities                       44.0
+ 62 Male      17 Personal Care Activities                       70.3
+ 63 Female    16 Caring For &amp; Helping Household (HH) Members    33.9
+ 64 Male      13 Personal Care Activities                       81.6
+ 65 Male      11 Caring For &amp; Helping Household (HH) Members    47.5
+ 66 Male      16 Caring For &amp; Helping Household (HH) Members    39.3
+ 67 Male      12 Caring For &amp; Helping Household (HH) Members    48.5
+ 68 Male      13 Caring For &amp; Helping Household (HH) Members    40.4
+ 69 Male       7 Caring For &amp; Helping Household (HH) Members    22.0
+ 70 Male       8 Caring For &amp; Helping Household (HH) Members    37.3
+ 71 Male      19 Caring For &amp; Helping Household (HH) Members    31.1
+ 72 Male      23 Caring For &amp; Helping Household (HH) Members    21.1
+ 73 Female    10 Personal Care Activities                       53.2
+ 74 Female    11 Caring For &amp; Helping Household (HH) Members    33.2
+ 75 Female    13 Household Activities                           45.8
+ 76 Female    17 Socializing, Relaxing, and Leisure            106. 
+ 77 Female    20 Socializing, Relaxing, and Leisure             86.8
+ 78 Female    23 Socializing, Relaxing, and Leisure             57.9
+ 79 Female     7 Personal Care Activities                       43.2
+ 80 Female    13 Socializing, Relaxing, and Leisure             98.7
+ 81 Female    17 Household Activities                           32.9
+ 82 Female    16 Household Activities                           37.0
+ 83 Female     6 Personal Care Activities                       44.3
+ 84 Female    12 Household Activities                           43.5
+ 85 Female    20 Household Activities                           28.7
+ 86 Male       7 Socializing, Relaxing, and Leisure             95.9
+ 87 Male      22 Personal Care Activities                      263. 
+ 88 Male       8 Socializing, Relaxing, and Leisure            114. 
+ 89 Male      13 Household Activities                           59.7
+ 90 Male      15 Household Activities                           43.9
+ 91 Male      15 Socializing, Relaxing, and Leisure            108. 
+ 92 Male      17 Socializing, Relaxing, and Leisure            126. 
+ 93 Male      19 Socializing, Relaxing, and Leisure            122. 
+ 94 Male      20 Socializing, Relaxing, and Leisure            100. 
+ 95 Female     8 Personal Care Activities                       42.1
+ 96 Female    16 Socializing, Relaxing, and Leisure             89.0
+ 97 Female    12 Socializing, Relaxing, and Leisure            101. 
+ 98 Female    22 Household Activities                           24.7
+ 99 Female    22 Socializing, Relaxing, and Leisure             59.8
+100 Male       9 Personal Care Activities                       48.5
+101 Male      16 Socializing, Relaxing, and Leisure            107  
+102 Female     9 Personal Care Activities                       46.8
+103 Female     7 Caring For &amp; Helping Household (HH) Members    22.8
+104 Female    14 Caring For &amp; Helping Household (HH) Members    30.2
+105 Female    21 Household Activities                           26.8
+106 Female    21 Socializing, Relaxing, and Leisure             72.0
+107 Male       7 Household Activities                           52.3
+108 Male      12 Socializing, Relaxing, and Leisure            131. 
+109 Male      21 Personal Care Activities                      266. 
+110 Female     6 Caring For &amp; Helping Household (HH) Members    25.5
+111 Female    18 Caring For &amp; Helping Household (HH) Members    34.4
+112 Female    19 Caring For &amp; Helping Household (HH) Members    27.5
+113 Female    11 Personal Care Activities                       59.6
+114 Female    14 Personal Care Activities                       66.6
+115 Female    23 Household Activities                           22.2
+116 Male       6 Socializing, Relaxing, and Leisure             97.9
+117 Female     8 Caring For &amp; Helping Household (HH) Members    28.8
+118 Female    15 Caring For &amp; Helping Household (HH) Members    30.2
+119 Male      10 Personal Care Activities                       56.4
+120 Male      11 Socializing, Relaxing, and Leisure            113. 
+121 Male      16 Household Activities                           38.0
+122 Male      17 Household Activities                           34.5
+123 Male      19 Household Activities                           32.6
+124 Male      23 Socializing, Relaxing, and Leisure             65.4
+125 Male      11 Household Activities                           47.8
+126 Male      12 Household Activities                           54.1
+127 Female    18 Personal Care Activities                       80.2
+128 Male       8 Household Activities                           61.3
+129 Male      14 Personal Care Activities                       75.3
+130 Male      13 Socializing, Relaxing, and Leisure            128. 
+131 Male      10 Caring For &amp; Helping Household (HH) Members    39.1
+132 Female     9 Caring For &amp; Helping Household (HH) Members    42.2
+133 Female    10 Caring For &amp; Helping Household (HH) Members    40.7
+134 Female    19 Personal Care Activities                      118. 
+135 Female    15 Personal Care Activities                       60.7
+136 Male       6 Household Activities                           41.7
+137 Male      18 Personal Care Activities                       95.8
+138 Male       9 Caring For &amp; Helping Household (HH) Members    51.7
+139 Male      23 Household Activities                           22.2
+140 Male      20 Household Activities                           29.2
+141 Male      14 Caring For &amp; Helping Household (HH) Members    34.4
+142 Male      18 Caring For &amp; Helping Household (HH) Members    43.2
+143 Male      21 Caring For &amp; Helping Household (HH) Members    24.6
+144 Male      22 Caring For &amp; Helping Household (HH) Members    18.9</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="analysis_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="analysis_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
